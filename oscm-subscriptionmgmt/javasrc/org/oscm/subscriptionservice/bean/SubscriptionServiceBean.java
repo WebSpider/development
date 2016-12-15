@@ -7,29 +7,12 @@
  *******************************************************************************/
 package org.oscm.subscriptionservice.bean;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.*;
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 
@@ -45,37 +28,7 @@ import org.oscm.communicationservice.local.CommunicationServiceLocal;
 import org.oscm.configurationservice.local.ConfigurationServiceLocal;
 import org.oscm.converter.ParameterizedTypes;
 import org.oscm.dataservice.local.DataService;
-import org.oscm.domobjects.BillingContact;
-import org.oscm.domobjects.CatalogEntry;
-import org.oscm.domobjects.Marketplace;
-import org.oscm.domobjects.OnBehalfUserReference;
-import org.oscm.domobjects.OperationParameter;
-import org.oscm.domobjects.OperationRecord;
-import org.oscm.domobjects.Organization;
-import org.oscm.domobjects.OrganizationRefToPaymentType;
-import org.oscm.domobjects.OrganizationReference;
-import org.oscm.domobjects.OrganizationRole;
-import org.oscm.domobjects.OrganizationToRole;
-import org.oscm.domobjects.Parameter;
-import org.oscm.domobjects.ParameterDefinition;
-import org.oscm.domobjects.ParameterSet;
-import org.oscm.domobjects.PaymentInfo;
-import org.oscm.domobjects.PaymentType;
-import org.oscm.domobjects.PlatformUser;
-import org.oscm.domobjects.PriceModel;
-import org.oscm.domobjects.Product;
-import org.oscm.domobjects.RoleDefinition;
-import org.oscm.domobjects.Session;
-import org.oscm.domobjects.Subscription;
-import org.oscm.domobjects.TechnicalProduct;
-import org.oscm.domobjects.TechnicalProductOperation;
-import org.oscm.domobjects.TriggerDefinition;
-import org.oscm.domobjects.TriggerProcess;
-import org.oscm.domobjects.TriggerProcessIdentifier;
-import org.oscm.domobjects.TriggerProcessParameter;
-import org.oscm.domobjects.Uda;
-import org.oscm.domobjects.UsageLicense;
-import org.oscm.domobjects.UserGroup;
+import org.oscm.domobjects.*;
 import org.oscm.domobjects.enums.LocalizedObjectTypes;
 import org.oscm.domobjects.enums.ModifiedEntityType;
 import org.oscm.domobjects.enums.OrganizationReferenceType;
@@ -90,64 +43,14 @@ import org.oscm.interceptor.ExceptionMapper;
 import org.oscm.interceptor.InvocationDateContainer;
 import org.oscm.internal.intf.SubscriptionSearchService;
 import org.oscm.internal.intf.SubscriptionService;
-import org.oscm.internal.types.enumtypes.ConfigurationKey;
-import org.oscm.internal.types.enumtypes.OperationStatus;
-import org.oscm.internal.types.enumtypes.OrganizationRoleType;
-import org.oscm.internal.types.enumtypes.ParameterModificationType;
-import org.oscm.internal.types.enumtypes.ParameterType;
-import org.oscm.internal.types.enumtypes.PerformanceHint;
-import org.oscm.internal.types.enumtypes.ServiceAccessType;
-import org.oscm.internal.types.enumtypes.ServiceStatus;
-import org.oscm.internal.types.enumtypes.ServiceType;
-import org.oscm.internal.types.enumtypes.SubscriptionStatus;
-import org.oscm.internal.types.enumtypes.TriggerType;
-import org.oscm.internal.types.enumtypes.UserRoleType;
+import org.oscm.internal.types.enumtypes.*;
+import org.oscm.internal.types.exception.*;
 import org.oscm.internal.types.exception.ConcurrentModificationException;
-import org.oscm.internal.types.exception.DomainObjectException;
 import org.oscm.internal.types.exception.IllegalArgumentException;
-import org.oscm.internal.types.exception.InvalidPhraseException;
-import org.oscm.internal.types.exception.MailOperationException;
-import org.oscm.internal.types.exception.MandatoryUdaMissingException;
-import org.oscm.internal.types.exception.NonUniqueBusinessKeyException;
 import org.oscm.internal.types.exception.ObjectNotFoundException;
-import org.oscm.internal.types.exception.OperationNotPermittedException;
-import org.oscm.internal.types.exception.OperationPendingException;
 import org.oscm.internal.types.exception.OperationPendingException.ReasonEnum;
-import org.oscm.internal.types.exception.OperationStateException;
-import org.oscm.internal.types.exception.OrganizationAuthoritiesException;
-import org.oscm.internal.types.exception.PaymentDataException;
-import org.oscm.internal.types.exception.PaymentInformationException;
-import org.oscm.internal.types.exception.PriceModelException;
-import org.oscm.internal.types.exception.SaaSApplicationException;
-import org.oscm.internal.types.exception.SaaSSystemException;
-import org.oscm.internal.types.exception.ServiceChangedException;
-import org.oscm.internal.types.exception.ServiceParameterException;
-import org.oscm.internal.types.exception.SubscriptionAlreadyExistsException;
-import org.oscm.internal.types.exception.SubscriptionMigrationException;
 import org.oscm.internal.types.exception.SubscriptionMigrationException.Reason;
-import org.oscm.internal.types.exception.SubscriptionStateException;
-import org.oscm.internal.types.exception.SubscriptionStillActiveException;
-import org.oscm.internal.types.exception.TechnicalServiceNotAliveException;
-import org.oscm.internal.types.exception.TechnicalServiceOperationException;
-import org.oscm.internal.types.exception.ValidationException;
-import org.oscm.internal.vo.VOBillingContact;
-import org.oscm.internal.vo.VOInstanceInfo;
-import org.oscm.internal.vo.VOLocalizedText;
-import org.oscm.internal.vo.VOOrganization;
-import org.oscm.internal.vo.VOParameter;
-import org.oscm.internal.vo.VOPaymentInfo;
-import org.oscm.internal.vo.VORoleDefinition;
-import org.oscm.internal.vo.VOService;
-import org.oscm.internal.vo.VOServiceOperationParameter;
-import org.oscm.internal.vo.VOServiceOperationParameterValues;
-import org.oscm.internal.vo.VOSubscription;
-import org.oscm.internal.vo.VOSubscriptionDetails;
-import org.oscm.internal.vo.VOSubscriptionIdAndOrganizations;
-import org.oscm.internal.vo.VOTechnicalServiceOperation;
-import org.oscm.internal.vo.VOUda;
-import org.oscm.internal.vo.VOUsageLicense;
-import org.oscm.internal.vo.VOUser;
-import org.oscm.internal.vo.VOUserSubscription;
+import org.oscm.internal.vo.*;
 import org.oscm.logging.Log4jLogger;
 import org.oscm.logging.LoggerFactory;
 import org.oscm.notification.vo.VONotification;
@@ -164,15 +67,7 @@ import org.oscm.sessionservice.local.SessionServiceLocal;
 import org.oscm.string.Strings;
 import org.oscm.subscriptionservice.assembler.SubscriptionAssembler;
 import org.oscm.subscriptionservice.auditlog.SubscriptionAuditLogCollector;
-import org.oscm.subscriptionservice.dao.BillingContactDao;
-import org.oscm.subscriptionservice.dao.MarketplaceDao;
-import org.oscm.subscriptionservice.dao.ModifiedEntityDao;
-import org.oscm.subscriptionservice.dao.OrganizationDao;
-import org.oscm.subscriptionservice.dao.ProductDao;
-import org.oscm.subscriptionservice.dao.SessionDao;
-import org.oscm.subscriptionservice.dao.SubscriptionDao;
-import org.oscm.subscriptionservice.dao.SubscriptionHistoryDao;
-import org.oscm.subscriptionservice.dao.UsageLicenseDao;
+import org.oscm.subscriptionservice.dao.*;
 import org.oscm.subscriptionservice.local.SubscriptionListServiceLocal;
 import org.oscm.subscriptionservice.local.SubscriptionServiceLocal;
 import org.oscm.taskhandling.local.TaskMessage;
@@ -191,13 +86,7 @@ import org.oscm.triggerservice.local.TriggerQueueServiceLocal;
 import org.oscm.triggerservice.notification.VONotificationBuilder;
 import org.oscm.triggerservice.validator.TriggerProcessValidator;
 import org.oscm.types.constants.Configuration;
-import org.oscm.types.enumtypes.EmailType;
-import org.oscm.types.enumtypes.LogMessageIdentifier;
-import org.oscm.types.enumtypes.PlatformParameterIdentifiers;
-import org.oscm.types.enumtypes.ProvisioningType;
-import org.oscm.types.enumtypes.TriggerProcessIdentifierName;
-import org.oscm.types.enumtypes.TriggerProcessParameterName;
-import org.oscm.types.enumtypes.UdaTargetType;
+import org.oscm.types.enumtypes.*;
 import org.oscm.types.exceptions.UserAlreadyAssignedException;
 import org.oscm.types.exceptions.UserNotAssignedException;
 import org.oscm.usergroupservice.bean.UserGroupServiceLocalBean;
@@ -5458,6 +5347,34 @@ public class SubscriptionServiceBean
         return subscriptions;
     }
 
+    @TransactionAttribute(TransactionAttributeType.MANDATORY)
+    private Integer getSubscriptionsSizeForUserInt(PlatformUser user,
+            PaginationFullTextFilter pagination) {
+        String fullTextFilterValue = pagination.getFullTextFilterValue();
+        Integer subCount = -1;
+        if (StringUtils.isNotEmpty(fullTextFilterValue)) {
+            Collection<Long> subscriptionKeys = Collections.emptySet();
+            try {
+                subscriptionKeys = getFilteredOutSubscriptionKeys(
+                        fullTextFilterValue);
+            } catch (InvalidPhraseException e) {
+                LOG.logError(Log4jLogger.SYSTEM_LOG, e,
+                        LogMessageIdentifier.ERROR);
+            } catch (ObjectNotFoundException e) {
+                LOG.logDebug("No subscription keys found");
+            }
+            if (!subscriptionKeys.isEmpty()) {
+                subCount = getSubscriptionDao()
+                        .getSubscriptionsSizeForUserWithSubscriptionKeys(user,
+                                pagination, subscriptionKeys);
+            }
+        } else {
+            subCount = getSubscriptionDao().getSubscriptionsSizeForUser(user,
+                    pagination);
+        }
+        return subCount;
+    }
+
     /**
      * Implementation of method which should return set of Long object, which
      * represents subscriptions retunred in full text search process
@@ -5483,7 +5400,7 @@ public class SubscriptionServiceBean
     public Integer getSubscriptionsSizeForCurrentUserWithFiltering(
             PaginationFullTextFilter pagination) {
         PlatformUser user = dataManager.getCurrentUser();
-        return getSubscriptionsForUserInt(user, pagination).size();
+        return getSubscriptionsSizeForUserInt(user, pagination);
     }
 
     @Override

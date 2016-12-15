@@ -27,8 +27,8 @@ import org.oscm.logging.Log4jLogger;
 import org.oscm.logging.LoggerFactory;
 import org.oscm.paginator.Filter;
 import org.oscm.paginator.Pagination;
-import org.oscm.paginator.TableColumns;
 import org.oscm.paginator.Sorting;
+import org.oscm.paginator.TableColumns;
 
 /**
  * @author Mao
@@ -38,6 +38,12 @@ import org.oscm.paginator.Sorting;
 public class SubscriptionDao {
 
     private final static String SUBSCRIPTIONS_FOR_USER = "SELECT s.* FROM Subscription s "
+            + "LEFT JOIN product p ON (s.product_tkey = p.tkey) "
+            + "LEFT JOIN organization oCustomer ON s.organizationkey = oCustomer.tkey "
+            + "WHERE s.status IN (:status) "
+            + "AND EXISTS (SELECT 1 FROM UsageLicense lic WHERE lic.user_tkey = :userKey AND lic.subscription_tkey = s.tkey) ";
+
+    private final static String SUBSCRIPTIONS_COUNT_FOR_USER = "SELECT count(s.*) FROM Subscription s "
             + "LEFT JOIN product p ON (s.product_tkey = p.tkey) "
             + "LEFT JOIN organization oCustomer ON s.organizationkey = oCustomer.tkey "
             + "WHERE s.status IN (:status) "
@@ -1121,12 +1127,28 @@ public class SubscriptionDao {
         return getSubscriptionsForUser(user, pagination, queryString);
     }
 
+    public Integer getSubscriptionsSizeForUser(PlatformUser user,
+            org.oscm.paginator.Pagination pagination) {
+        String queryString = marketplacePaginatedQuery(SUBSCRIPTIONS_COUNT_FOR_USER,
+                pagination);
+        return getSubscriptionsSizeForUser(user, pagination, queryString);
+    }
+
     public List<Subscription> getSubscriptionsForUserWithSubscriptionKeys(
             PlatformUser user, org.oscm.paginator.Pagination pagination,
             Collection<Long> subscriptionKeys) {
         String queryString = marketplacePaginatedQuery(
                 SUBSCRIPTIONS_FOR_USER_WITH_KEYS, pagination);
         return getSubscriptionsForUser(user, pagination, queryString,
+                subscriptionKeys.toArray(new Long[subscriptionKeys.size()]));
+    }
+
+    public Integer getSubscriptionsSizeForUserWithSubscriptionKeys(
+            PlatformUser user, org.oscm.paginator.Pagination pagination,
+            Collection<Long> subscriptionKeys) {
+        String queryString = marketplacePaginatedQuery(
+                SUBSCRIPTIONS_COUNT_FOR_USER + "AND s.tkey IN (:keys) ", pagination);
+        return getSubscriptionsSizeForUser(user, pagination, queryString,
                 subscriptionKeys.toArray(new Long[subscriptionKeys.size()]));
     }
 
@@ -1158,6 +1180,18 @@ public class SubscriptionDao {
         setSubscriptionKeysParameter(query, subscriptionKeys);
         return ParameterizedTypes.list(query.getResultList(),
                 Subscription.class);
+    }
+
+    private Integer getSubscriptionsSizeForUser(PlatformUser user,
+            org.oscm.paginator.Pagination pagination, String queryString,
+            Long... subscriptionKeys) {
+
+        Query query = getSubscriptionsForUserNativeQuery(user, queryString);
+
+        setPaginationParameters(pagination, query);
+        setSubscriptionKeysParameter(query, subscriptionKeys);
+        BigInteger result = (BigInteger) query.getSingleResult();
+        return result.intValue();
     }
 
     private void setSubscriptionKeysParameter(Query query,

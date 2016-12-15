@@ -8,12 +8,7 @@
 
 package org.oscm.internal.subscriptions;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
@@ -23,11 +18,7 @@ import javax.interceptor.Interceptors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscm.dataservice.local.DataService;
-import org.oscm.domobjects.Organization;
-import org.oscm.domobjects.PlatformUser;
-import org.oscm.domobjects.Product;
-import org.oscm.domobjects.Subscription;
-import org.oscm.domobjects.TechnicalProduct;
+import org.oscm.domobjects.*;
 import org.oscm.domobjects.enums.LocalizedObjectTypes;
 import org.oscm.i18nservice.bean.LocalizerFacade;
 import org.oscm.i18nservice.local.LocalizerServiceLocal;
@@ -327,7 +318,7 @@ public class SubscriptionsServiceBean implements SubscriptionsService {
             PaginationFullTextFilter pagination)
             throws OrganizationAuthoritiesException {
         return subscriptionServiceLocal
-                .getSubscriptionsForCurrentUserWithFiltering(pagination).size();
+                .getSubscriptionsSizeForCurrentUserWithFiltering(pagination);
     }
 
     private List<POSubscription> toPOUserSubscriptionList(

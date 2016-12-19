@@ -30,14 +30,21 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
+import org.oscm.applicationservice.adapter.ProvisioningServiceAdapter;
+import org.oscm.applicationservice.adapter.ProvisioningServiceAdapterFactory;
 import org.oscm.converter.XMLConverter;
+import org.oscm.converter.api.VOConverter;
+import org.oscm.domobjects.TechnicalProduct;
 import org.oscm.ws.base.ServiceFactory;
+import org.oscm.ws.base.TSXMLForWebService;
 import org.oscm.ws.base.VOFactory;
 import org.oscm.ws.base.WebserviceTestBase;
 import org.oscm.ws.base.WebserviceTestSetup;
+import org.oscm.internal.types.enumtypes.ConfigurationKey;
 import org.oscm.intf.MarketplaceService;
 import org.oscm.intf.ServiceProvisioningService;
+import org.oscm.serviceprovisioningservice.assembler.TechnicalProductAssembler;
+import org.oscm.types.constants.Configuration;
 import org.oscm.types.enumtypes.ParameterModificationType;
 import org.oscm.types.enumtypes.PriceModelType;
 import org.oscm.types.enumtypes.PricingPeriod;
@@ -58,6 +65,7 @@ import org.oscm.vo.VOServiceDetails;
 import org.oscm.vo.VOSubscriptionDetails;
 import org.oscm.vo.VOTechnicalService;
 import org.oscm.vo.VOTriggerDefinition;
+
 import com.sun.xml.ws.fault.ServerSOAPFaultException;
 
 /**
@@ -410,6 +418,38 @@ public class ServiceProvisioningServiceWSTest {
                         para.getModificationType());
             }
         }
+    }
+
+    @Test
+    public void createTechnicalService_prov1_6() throws Exception {
+        VOTechnicalService voTechService = setup
+                .createTechnicalServiceForProv1_6("TS_PROV1_6");
+
+        TechnicalProduct techProduct = TechnicalProductAssembler
+                .toTechnicalProduct(VOConverter.convertToUp(voTechService));
+        techProduct.setProvisioningUsername("admin");
+        techProduct.setProvisioningPassword("adminadmin");
+
+        ProvisioningServiceAdapter port = ProvisioningServiceAdapterFactory
+                .getProvisioningServiceAdapter(techProduct,
+                        Integer.valueOf(6000000));
+        port.sendPing("ping");
+    }
+
+    @Test
+    public void createTechnicalService_prov1_7() throws Exception {
+        VOTechnicalService voTechService = setup
+                .createTechnicalServiceForProv1_7("TS_PROV1_7");
+
+        TechnicalProduct techProduct = TechnicalProductAssembler
+                .toTechnicalProduct(VOConverter.convertToUp(voTechService));
+        techProduct.setProvisioningUsername("admin");
+        techProduct.setProvisioningPassword("adminadmin");
+
+        ProvisioningServiceAdapter port = ProvisioningServiceAdapterFactory
+                .getProvisioningServiceAdapter(techProduct,
+                        Integer.valueOf(6000000));
+        port.sendPing("ping");
     }
 
     @Test

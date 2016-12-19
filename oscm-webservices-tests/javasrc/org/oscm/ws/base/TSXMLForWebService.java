@@ -23,13 +23,18 @@ public class TSXMLForWebService {
             + "TechnicalService></" + TNS + "TechnicalServices>";
     private static final String XML_FIRST_PART = "<" + TNS
             + "TechnicalServices " + TARGET_NAMESPACE + ">";
-    private static final String MOCK = "oscm-integrationtests-mockproduct";
+    private static final String MOCK_CURRENT_VERSION = "oscm-integrationtests-mockproduct";
 
     private TSXMLForWebService() {
     }
 
     public static String createTSXMLWithTags(String technicalProductId)
             throws Exception {
+        return createTSXMLWithTags(technicalProductId, MOCK_CURRENT_VERSION);
+    }
+
+    public static String createTSXMLWithTags(String technicalProductId,
+            String mock) throws Exception {
 
         String baseUrl = WebserviceTestBase
                 .getConfigSetting(WebserviceTestBase.EXAMPLE_BASE_URL);
@@ -39,14 +44,14 @@ public class TSXMLForWebService {
         sb.append("<tns:TechnicalService ");
         sb.append("accessType=\"DIRECT\" ");
         sb.append("allowingOnBehalfActing=\"false\" ");
-        sb.append("baseUrl=\"" + baseUrl + "/" + MOCK
-                + "/ProvisioningService?wsdl\" ");
+        sb.append("baseUrl=\"" + baseUrl + "/" + mock + "\" ");
         sb.append("build=\"\" ");
         sb.append("id=\"" + technicalProductId + "\" ");
         sb.append("loginPath=\"\" ");
         sb.append("onlyOneSubscriptionPerUser=\"false\" ");
         sb.append("provisioningType=\"SYNCHRONOUS\" ");
-        sb.append("provisioningUrl=\"\" ");
+        sb.append("provisioningUrl=\"" + baseUrl + "/" + mock
+                + "/ProvisioningService?wsdl\" ");
         sb.append("provisioningUsername=\"admin\" ");
         sb.append("provisioningPassword=\"adminadmin\" ");
         sb.append("provisioningVersion=\"\">");
@@ -62,6 +67,7 @@ public class TSXMLForWebService {
         sb.append("<LocalizedTag locale=\"de\">service_de</LocalizedTag>");
         sb.append(XML_LAST_PART);
 
+        System.out.println(sb.toString());
         return sb.toString();
     }
 
@@ -81,7 +87,7 @@ public class TSXMLForWebService {
                 + " provisioningUrl=\""
                 + baseUrl
                 + "/"
-                + MOCK
+                + MOCK_CURRENT_VERSION
                 + "/ProvisioningService?wsdl\""
                 + " provisioningVersion=\"1.0\" accessType=\"DIRECT\""
                 + " baseUrl=\""
@@ -119,7 +125,7 @@ public class TSXMLForWebService {
                 + " provisioningUrl=\""
                 + baseUrl
                 + "/"
-                + MOCK
+                + MOCK_CURRENT_VERSION
                 + "/ProvisioningService?wsdl\""
                 + " provisioningVersion=\"1.0\" accessType=\"DIRECT\""
                 + " baseUrl=\""
@@ -152,7 +158,7 @@ public class TSXMLForWebService {
                 + " provisioningUrl=\""
                 + baseUrl
                 + "/"
-                + MOCK
+                + MOCK_CURRENT_VERSION
                 + "/ProvisioningService?wsdl\""
                 + " provisioningVersion=\"1.0\" accessType=\"DIRECT\""
                 + " baseUrl=\""
@@ -194,7 +200,7 @@ public class TSXMLForWebService {
                 + " provisioningUrl=\""
                 + baseUrl
                 + "/"
-                + MOCK
+                + MOCK_CURRENT_VERSION
                 + "/ProvisioningService?wsdl\""
                 + " provisioningVersion=\"1.0\" accessType=\"DIRECT\""
                 + " baseUrl=\""
@@ -233,7 +239,7 @@ public class TSXMLForWebService {
                 + " provisioningUrl=\""
                 + baseUrl
                 + "/"
-                + MOCK
+                + MOCK_CURRENT_VERSION
                 + "/ProvisioningService?wsdl\""
                 + " provisioningVersion=\"1.0\" accessType=\"DIRECT\""
                 + " baseUrl=\""
@@ -280,7 +286,7 @@ public class TSXMLForWebService {
                 + " baseUrl=\""
                 + baseUrl
                 + "/"
-                + MOCK
+                + MOCK_CURRENT_VERSION
                 + "\""
                 + " loginPath=\"/login\" provisioningTimeout=\"50000\""
                 + " provisioningUsername=\"admin\" provisioningPassword=\"adminadmin\">"
@@ -322,7 +328,7 @@ public class TSXMLForWebService {
                 + " provisioningUrl=\""
                 + baseUrl
                 + "/"
-                + MOCK
+                + MOCK_CURRENT_VERSION
                 + "/ProvisioningService?wsdl\""
                 + " provisioningVersion=\"1.0\" accessType=\"DIRECT\""
                 + " baseUrl=\""
@@ -336,7 +342,7 @@ public class TSXMLForWebService {
                 + "<Operation id=\"SNAPSHOT\" actionURL=\""
                 + baseUrl
                 + "/"
-                + MOCK
+                + MOCK_CURRENT_VERSION
                 + "/OperationService?wsdl\">"
                 + "<LocalizedName locale=\"en\">Help</LocalizedName>"
                 + "<LocalizedDescription locale=\"en\">Help activation.</LocalizedDescription>"

@@ -28,5 +28,8 @@
 	<classpathentry kind="lib" path="/libraries/mockito/javalib/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="src" path="/oscm-apiversioning-client-handler"/>
 	<classpathentry kind="src" path="/oscm-psp-extsvc"/>
+	<classpathentry kind="src" path="/oscm-application"/>
+	<classpathentry kind="src" path="/oscm-serviceprovisioning-intsvc"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/oscm-intsvc-base"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

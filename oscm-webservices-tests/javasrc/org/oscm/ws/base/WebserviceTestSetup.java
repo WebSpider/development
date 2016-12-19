@@ -63,6 +63,8 @@ public class WebserviceTestSetup {
                     TriggerProcessStatus.WAITING_FOR_APPROVAL,
                     TriggerProcessStatus.INITIAL));
 
+    private static final String MOCK_V1_7_VERSION = "oscm-integrationtests-mockproduct-prov1_7";
+    private static final String MOCK_V1_6_VERSION = "fujitsu-adm-um-integrationtests-mockproduct";
     private AccountService accSrvAsSupplier;
     private ServiceProvisioningService serviceProvisioningSrvAsSupplier,
             serviceProvisioningSrvAsTechnologyProvider;
@@ -96,7 +98,8 @@ public class WebserviceTestSetup {
                 supplierUserId, namePrefix,
                 OrganizationRoleType.TECHNOLOGY_PROVIDER,
                 OrganizationRoleType.SUPPLIER);
-        supplierUserKey = WebserviceTestBase.readLastMailAndSetCommonPassword(supplierUserId);
+        supplierUserKey = WebserviceTestBase
+                .readLastMailAndSetCommonPassword(supplierUserId);
         WebserviceTestBase.savePaymentInfoToSupplier(supplier,
                 PaymentInfoType.INVOICE);
         accSrvAsSupplier = ServiceFactory.getDefault().getAccountService(
@@ -135,7 +138,8 @@ public class WebserviceTestSetup {
                 + WebserviceTestBase.createUniqueKey();
         VOOrganization reseller = WebserviceTestBase.createOrganization(
                 resellerUserId, namePrefix, OrganizationRoleType.RESELLER);
-        resellerUserKey = WebserviceTestBase.readLastMailAndSetCommonPassword(resellerUserId);
+        resellerUserKey = WebserviceTestBase
+                .readLastMailAndSetCommonPassword(resellerUserId);
         List<VOPSP> psps = WebserviceTestBase.getOperator().getPSPs();
         for (VOPSP voPsp : psps) {
             VOPSPAccount newPspAccount = new VOPSPAccount();
@@ -579,6 +583,26 @@ public class WebserviceTestSetup {
 
     public String getGlobalMarketplaceId() throws Exception {
         return WebserviceTestBase.getGlobalMarketplaceId();
+    }
+
+    public VOTechnicalService createTechnicalServiceForProv1_6(String serviceId)
+            throws Exception {
+        String tsxml = TSXMLForWebService.createTSXMLWithTags(serviceId,
+                MOCK_V1_6_VERSION);
+        VOTechnicalService voTechService = WebserviceTestBase
+                .createTechnicalService(tsxml,
+                        serviceProvisioningSrvAsTechnologyProvider);
+        return voTechService;
+    }
+
+    public VOTechnicalService createTechnicalServiceForProv1_7(String serviceId)
+            throws Exception {
+        String tsxml = TSXMLForWebService.createTSXMLWithTags(serviceId,
+                MOCK_V1_7_VERSION);
+        VOTechnicalService voTechService = WebserviceTestBase
+                .createTechnicalService(tsxml,
+                        serviceProvisioningSrvAsTechnologyProvider);
+        return voTechService;
     }
 
     public VOTechnicalService createTechnicalServiceWithParameterDefinition(

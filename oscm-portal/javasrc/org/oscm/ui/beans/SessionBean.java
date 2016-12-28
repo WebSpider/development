@@ -31,13 +31,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscm.billing.external.pricemodel.service.PriceModel;
+import org.oscm.internal.intf.ConfigurationService;
 import org.oscm.internal.intf.MarketplaceCacheService;
 import org.oscm.internal.intf.MarketplaceService;
+import org.oscm.internal.types.enumtypes.ConfigurationKey;
 import org.oscm.internal.types.exception.MarketplaceRemovedException;
 import org.oscm.internal.types.exception.ObjectNotFoundException;
 import org.oscm.internal.types.exception.SaaSSystemException;
+import org.oscm.internal.vo.VOConfigurationSetting;
 import org.oscm.logging.Log4jLogger;
 import org.oscm.logging.LoggerFactory;
+import org.oscm.types.constants.Configuration;
 import org.oscm.types.enumtypes.LogMessageIdentifier;
 import org.oscm.ui.common.*;
 import org.oscm.ui.filter.AuthorizationRequestData;
@@ -65,6 +69,8 @@ public class SessionBean implements Serializable {
     private MarketplaceCacheService mkpCache;
     @EJB
     private MarketplaceService mkpService;
+    @EJB
+    private ConfigurationService cfgService;
 
 
     /**
@@ -567,12 +573,23 @@ public class SessionBean implements Serializable {
     }
 
     public String getTenantID() throws MarketplaceRemovedException {
-        if(StringUtils.isBlank(tenantID)) {
-            tenantID = getTenantIDFromMarketplace();
+        
+        String tenantIdFromMarketplace = getTenantIDFromMarketplace();
+        String tenantIdFromSession = (String) new UiDelegate().getSession()
+                .getAttribute(REQ_PARAM_TENANT_ID);
+        VOConfigurationSetting defaultTenantId = cfgService
+                .getVOConfigurationSetting(
+                        ConfigurationKey.SSO_DEFAULT_TENANT_ID,
+                        Configuration.GLOBAL_CONTEXT);
+
+        if (!StringUtils.isBlank(tenantIdFromMarketplace)) {
+            tenantID = tenantIdFromMarketplace;
+        } else if (!StringUtils.isBlank(tenantIdFromSession)) {
+            tenantID = tenantIdFromSession;
+        } else {
+            tenantID = defaultTenantId.getValue();
         }
-        if(StringUtils.isBlank(tenantID)) {
-            tenantID = (String) new UiDelegate().getSession().getAttribute(REQ_PARAM_TENANT_ID);
-        }
+
         return tenantID;
     }
 
